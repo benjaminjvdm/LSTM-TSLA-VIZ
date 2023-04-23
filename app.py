@@ -47,15 +47,18 @@ def visualize_stock_price_history():
     st.pyplot()
 
 def predict_stock_price(p, d, q):
-    model = ARIMA(tsla_data['Close'], order=(p, d, q))
+    # Filter data based on selected dates
+    tsla_data_filtered = tsla_data.loc[start_date:end_date]
+
+    model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
     results = model.fit()
     future_periods = 30
     forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
-    plt.plot(tsla_data.index, tsla_data['Close'])
-    date_range = pd.date_range(start=tsla_data.index[-1], periods=future_periods+1, freq='D')[1:]
+    plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
+    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='D')[1:]
     plt.plot(date_range, forecast, label="Predicted Price")
     plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
     plt.xlabel("Date")
