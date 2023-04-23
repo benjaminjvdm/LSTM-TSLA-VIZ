@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.stattools import adfuller
 import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
