@@ -63,7 +63,7 @@ def predict_stock_price(use_auto_arima):
         q = st.slider("MA parameter (q)", 0, 10, 2)
     
     # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
+    model = ARIMA(tsla_data_filtered['Close'], order=(int(p), int(d), int(q)))
     results = model.fit()
     future_periods = 30
     forecast = results.forecast(steps=future_periods)
