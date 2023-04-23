@@ -52,9 +52,9 @@ def predict_stock_price(p, d, q, use_grid_search):
 
     if use_grid_search:
         # Perform grid search to find optimal parameters
-        p_values = range(0, 3)
-        d_values = range(0, 3)
-        q_values = range(0, 3)
+        p_values = range(0, 7)
+        d_values = range(0, 7)
+        q_values = range(0, 7)
         best_aic, best_order = np.inf, None
         for p in p_values:
             for d in d_values:
@@ -74,7 +74,7 @@ def predict_stock_price(p, d, q, use_grid_search):
     # Build the ARIMA model with selected or best parameters
     model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
     results = model.fit()
-    future_periods = 30
+    future_periods = 120
     forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
@@ -102,9 +102,9 @@ def main():
         visualize_stock_price_history()
     elif option == 'Predict future stock prices':
         # ARIMA model parameters
-        p = st.sidebar.slider("ARIMA (p) parameter", 0, 3, 1)
-        d = st.sidebar.slider("ARIMA (d) parameter", 0, 3, 1)
-        q = st.sidebar.slider("ARIMA (q) parameter", 0, 3, 1)
+        p = st.sidebar.slider("ARIMA (p) parameter", 0, 7, 1)
+        d = st.sidebar.slider("ARIMA (d) parameter", 0, 7, 1)
+        q = st.sidebar.slider("ARIMA (q) parameter", 0, 7, 1)
 
         # Use grid search to find optimal parameters
         use_grid_search = st.sidebar.checkbox("Use grid search to find optimal parameters")
