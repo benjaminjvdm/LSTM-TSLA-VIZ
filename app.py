@@ -11,7 +11,6 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load TSLA data from yfinance
 tsla_data = yf.download("TSLA", start="2015-01-01")
-tsla_data = tsla_data.asfreq('D', method='ffill')  # Set frequency and forward fill missing values
 
 # Global date range filter
 start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
@@ -47,24 +46,21 @@ def visualize_stock_price_history():
     axes[2].legend()
     st.pyplot()
 
-def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
+def predict_stock_price(p, d, q, use_grid_search):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
-    # Apply first-order difference to remove trend and seasonality
-    tsla_data_diff = tsla_data_filtered['Close'].diff().dropna()
-
     if use_grid_search:
         # Perform grid search to find optimal parameters
-        p_values = range(0, 7)
-        d_values = range(0, 7)
-        q_values = range(0, 7)
+        p_values = range(0, 3)
+        d_values = range(0, 3)
+        q_values = range(0, 3)
         best_aic, best_order = np.inf, None
         for p in p_values:
             for d in d_values:
                 for q in q_values:
                     try:
-                        model = ARIMA(tsla_data_diff, order=(p, d, q))
+                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
                         results = model.fit()
                         aic = results.aic
                         if aic < best_aic:
@@ -72,18 +68,14 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
                     except:
                         continue
 
-        ar_param, integration_order, ma_param = best_order
-        st.write(f"Best ARIMA parameters found by grid search: (p = {ar_param}, d = {integration_order}, q = {ma_param})")
+        p, d, q = best_order
+        st.write(f"Best ARIMA parameters found by grid search: (p = {p}, d = {d}, q = {q})")
     
     # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_diff, order=(ar_param, integration_order, ma_param))
+    model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
     results = model.fit()
-    future_periods = 7
-    forecast_diff = results.forecast(steps=future_periods)
-
-    # Add back the last observed value and cumulatively sum the forecasted differences to get the forecasted prices
-    last_observed_value = tsla_data_filtered['Close'].iloc[-1]
-    forecast = np.cumsum(forecast_diff) + last_observed_value
+    future_periods = 30
+    forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
@@ -108,12 +100,12 @@ def main():
 
     else:
         st.write("Enter ARIMA model parameters:")
-        p = st.slider("AR parameter (p)", 0, 7, 2)
-        d = st.slider("Integration order (d)", 0, 7, 1)
-        q = st.slider("MA parameter (q)", 0, 7, 2)
+        p = st.slider("AR parameter (p)", 0, 5, 2)
+        d = st.slider("Integration order (d)", 0, 5, 1)
+        q = st.slider("MA parameter (q)", 0, 5, 2)
         use_grid_search = st.checkbox("Use grid search to find optimal parameters", value=False)
 
         predict_stock_price(p, d, q, use_grid_search)
 
 if __name__ == "__main__":
-    main()
+    main() 
