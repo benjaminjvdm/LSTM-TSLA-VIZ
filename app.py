@@ -12,9 +12,12 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 # Load TSLA data from yfinance
 tsla_data = yf.download("TSLA", start="2015-01-01")
 
-def visualize_stock_price_history():
+def visualize_stock_price_history(start_date, end_date):
+    # Filter data based on selected dates
+    tsla_data_filtered = tsla_data.loc[start_date:end_date]
+
     # Relative Strength Index (RSI)
-    delta = tsla_data['Close'].diff()
+    delta = tsla_data_filtered['Close'].diff()
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
     avg_gain = gain.rolling(window=14).mean()
@@ -22,19 +25,19 @@ def visualize_stock_price_history():
     rsi = 100 - (100 / (1 + (avg_gain / avg_loss)))
     
     # Stochastic Oscillator
-    high_14, low_14 = tsla_data['High'].rolling(window=14).max(), tsla_data['Low'].rolling(window=14).min()
-    k_percent = 100 * ((tsla_data['Close'] - low_14) / (high_14 - low_14))
+    high_14, low_14 = tsla_data_filtered['High'].rolling(window=14).max(), tsla_data_filtered['Low'].rolling(window=14).min()
+    k_percent = 100 * ((tsla_data_filtered['Close'] - low_14) / (high_14 - low_14))
     d_percent = k_percent.rolling(window=3).mean()
 
     # Plot stock price history, RSI, and Stochastic Oscillator
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16,12), sharex=True)
-    axes[0].plot(tsla_data.index, tsla_data['Close'])
+    axes[0].plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
     axes[0].set_title('Tesla (TSLA) Stock Price History')
     axes[0].set_ylabel('Closing price ($)')
-    axes[1].plot(tsla_data.index, rsi)
+    axes[1].plot(tsla_data_filtered.index, rsi)
     axes[1].set_title('Relative Strength Index (RSI)')
-    axes[2].plot(tsla_data.index, k_percent, label='%K')
-    axes[2].plot(tsla_data.index, d_percent, label='%D')
+    axes[2].plot(tsla_data_filtered.index, k_percent, label='%K')
+    axes[2].plot(tsla_data_filtered.index, d_percent, label='%D')
     axes[2].set_title('Stochastic Oscillator')
     axes[2].legend()
     st.pyplot()
@@ -64,7 +67,10 @@ def main():
     option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
 
     if option == "Stock Price History and Technical Indicators":
-        visualize_stock_price_history()
+        # Date range filter
+        start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
+        end_date = st.sidebar.date_input("End date", value=tsla_data.index.max())
+        visualize_stock_price_history(start_date, end_date)
 
     else:
         st.write("Enter ARIMA model parameters:")
