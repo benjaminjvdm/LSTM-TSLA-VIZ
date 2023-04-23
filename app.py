@@ -11,6 +11,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load TSLA data from yfinance
 tsla_data = yf.download("TSLA", start="2015-01-01")
+tsla_data = tsla_data.asfreq('D', method='ffill')  # Set frequency and forward fill missing values
 
 # Global date range filter
 start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
