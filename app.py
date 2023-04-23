@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from statsmodels.tsa.arima.model import ARIMA
+from pmdarima.arima import auto_arima
 import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
@@ -46,30 +46,21 @@ def visualize_stock_price_history():
     axes[2].legend()
     st.pyplot()
 
-def predict_stock_price(p, d, q, use_grid_search):
+def predict_stock_price(use_auto_arima):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
-    if use_grid_search:
-        # Perform grid search to find optimal parameters
-        p_values = range(0, 10)
-        d_values = range(0, 10)
-        q_values = range(0, 10)
-        best_aic, best_order = np.inf, None
-        for p in p_values:
-            for d in d_values:
-                for q in q_values:
-                    try:
-                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
-                        results = model.fit()
-                        aic = results.aic
-                        if aic < best_aic:
-                            best_aic, best_order = aic, (p, d, q)
-                    except:
-                        continue
-
-        p, d, q = best_order
-        st.write(f"Best ARIMA parameters found by grid search: (p = {p}, d = {d}, q = {q})")
+    if use_auto_arima:
+        # Perform auto-ARIMA to find optimal parameters
+        model = auto_arima(tsla_data_filtered['Close'], seasonal=False, trace=True, error_action='ignore', suppress_warnings=True)
+        p, d, q = model.order
+        st.write(f"Best ARIMA parameters found by auto-ARIMA: (p = {p}, d = {d}, q = {q})")
+    
+    else:
+        st.write("Enter ARIMA model parameters:")
+        p = st.slider("AR parameter (p)", 0, 10, 2)
+        d = st.slider("Integration order (d)", 0, 10, 1)
+        q = st.slider("MA parameter (q)", 0, 10, 2)
     
     # Build the ARIMA model with selected or best parameters
     model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
@@ -90,7 +81,7 @@ def predict_stock_price(p, d, q, use_grid_search):
 
 # Streamlit app
 def main():
-    st.title("Tesla (TSLA) Stock Price Analysis")
+        st.title("Tesla (TSLA) Stock Price Analysis")
 
     # Sidebar options
     option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
@@ -99,13 +90,8 @@ def main():
         visualize_stock_price_history()
 
     else:
-        st.write("Enter ARIMA model parameters:")
-        p = st.slider("AR parameter (p)", 0, 10, 2)
-        d = st.slider("Integration order (d)", 0, 10, 1)
-        q = st.slider("MA parameter (q)", 0, 10, 2)
-        use_grid_search = st.checkbox("Use grid search to find optimal parameters", value=False)
-
-        predict_stock_price(p, d, q, use_grid_search)
+        use_auto_arima = st.checkbox("Use auto-ARIMA to find optimal parameters", value=True)
+        predict_stock_price(use_auto_arima)
 
 if __name__ == "__main__":
     main()
