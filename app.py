@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from pmdarima.arima import auto_arima
+from pmdarima.arima import auto_arima, ARIMA
 import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
@@ -44,7 +44,7 @@ def visualize_stock_price_history():
     axes[2].plot(tsla_data_filtered.index, d_percent, label='%D')
     axes[2].set_title('Stochastic Oscillator')
     axes[2].legend()
-    st.pyplot()
+    st.pyplot(fig)
 
 def predict_stock_price(use_auto_arima):
     # Filter data based on selected dates
@@ -69,29 +69,29 @@ def predict_stock_price(use_auto_arima):
     forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
-    plt.figure(figsize=(16,8))
-    plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
+    fig, ax = plt.subplots(figsize=(16,8))
+    ax.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
     date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='D')[1:]
-    plt.plot(date_range, forecast, label="Predicted Price")
-    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
-    plt.xlabel("Date")
-    plt.ylabel("Closing price ($)")
-    plt.legend()
-    st.pyplot()
+    ax.plot(date_range, forecast, label="Predicted Price")
+    ax.set_title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Closing price ($)")
+    ax.legend()
+    st.pyplot
 
-# Streamlit app
+#Streamlit
 def main():
-    st.title("Tesla (TSLA) Stock Price Analysis")
+st.title("Tesla (TSLA) Stock Price Analysis")
 
-    # Sidebar options
-    option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
+# Sidebar options
+option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
 
-    if option == "Stock Price History and Technical Indicators":
-        visualize_stock_price_history()
+if option == "Stock Price History and Technical Indicators":
+    visualize_stock_price_history()
 
-    else:
-        use_auto_arima = st.checkbox("Use auto-ARIMA to find optimal parameters", value=True)
-        predict_stock_price(use_auto_arima)
+else:
+    use_auto_arima = st.checkbox("Use auto-ARIMA to find optimal parameters", value=True)
+    predict_stock_price(use_auto_arima)
 
-if __name__ == "__main__":
-    main()
+if name == "main":
+main()
