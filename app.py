@@ -74,7 +74,7 @@ def predict_stock_price(p, d, q, use_grid_search):
     # Build the ARIMA model with selected or best parameters
     model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
     results = model.fit()
-    future_periods = 120
+    future_periods = 30
     forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
