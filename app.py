@@ -80,9 +80,9 @@ def predict_stock_price(p, d, q, use_grid_search):
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
     plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
-    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='H')[1:]
+    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1)[1:]
     plt.plot(date_range, forecast, label="Predicted Price")
-    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Hours")
+    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
     plt.xlabel("Date")
     plt.ylabel("Closing price ($)")
     plt.legend()
