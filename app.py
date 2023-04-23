@@ -46,7 +46,7 @@ def visualize_stock_price_history():
     axes[2].legend()
     st.pyplot()
 
-def predict_stock_price(p, d, q, use_grid_search):
+def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
@@ -68,11 +68,11 @@ def predict_stock_price(p, d, q, use_grid_search):
                     except:
                         continue
 
-        p, d, q = best_order
-        st.write(f"Best ARIMA parameters found by grid search: (p = {p}, d = {d}, q = {q})")
+        ar_param, integration_order, ma_param = best_order
+        st.write(f"Best ARIMA parameters found by grid search: (p = {ar_param}, d = {integration_order}, q = {ma_param})")
     
     # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
+    model = ARIMA(tsla_data_filtered['Close'], order=(ar_param, integration_order, ma_param))
     results = model.fit()
     future_periods = 7
     forecast = results.forecast(steps=future_periods)
@@ -87,7 +87,6 @@ def predict_stock_price(p, d, q, use_grid_search):
     plt.ylabel("Closing price ($)")
     plt.legend()
     st.pyplot()
-
 
 # Streamlit app
 def main():
