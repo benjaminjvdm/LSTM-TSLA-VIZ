@@ -77,7 +77,8 @@ def predict_stock_price(use_auto_arima):
     ax.set_xlabel("Date")
     ax.set_ylabel("Closing price ($)")
     ax.legend()
-    st.pyplot
+    st.pyplot(fig)  # Display the plot and clear the plt object from memory
+
 
 #Streamlit App
 def main():
