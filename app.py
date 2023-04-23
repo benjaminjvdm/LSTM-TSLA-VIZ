@@ -46,10 +46,32 @@ def visualize_stock_price_history():
     axes[2].legend()
     st.pyplot()
 
-def predict_stock_price(p, d, q):
+def predict_stock_price(p, d, q, use_grid_search):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
+    if use_grid_search:
+        # Perform grid search to find optimal parameters
+        p_values = range(0, 3)
+        d_values = range(0, 3)
+        q_values = range(0, 3)
+        best_aic, best_order = np.inf, None
+        for p in p_values:
+            for d in d_values:
+                for q in q_values:
+                    try:
+                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
+                        results = model.fit()
+                        aic = results.aic
+                        if aic < best_aic:
+                            best_aic, best_order = aic, (p, d, q)
+                    except:
+                        continue
+
+        p, d, q = best_order
+        st.write(f"Best ARIMA parameters found by grid search: (p = {p}, d = {d}, q = {q})")
+    
+    # Build the ARIMA model with selected or best parameters
     model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
     results = model.fit()
     future_periods = 30
@@ -81,8 +103,9 @@ def main():
         p = st.slider("AR parameter (p)", 0, 5, 2)
         d = st.slider("Integration order (d)", 0, 5, 1)
         q = st.slider("MA parameter (q)", 0, 5, 2)
+        use_grid_search = st.checkbox("Use grid search to find optimal parameters", value=False)
 
-        predict_stock_price(p, d, q)
+        predict_stock_price(p, d, q, use_grid_search)
 
 if __name__ == "__main__":
     main()
