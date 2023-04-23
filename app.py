@@ -12,7 +12,11 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 # Load TSLA data from yfinance
 tsla_data = yf.download("TSLA", start="2015-01-01")
 
-def visualize_stock_price_history(start_date, end_date):
+# Global date range filter
+start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
+end_date = st.sidebar.date_input("End date", value=tsla_data.index.max())
+
+def visualize_stock_price_history():
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
@@ -67,10 +71,7 @@ def main():
     option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
 
     if option == "Stock Price History and Technical Indicators":
-        # Date range filter
-        start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
-        end_date = st.sidebar.date_input("End date", value=tsla_data.index.max())
-        visualize_stock_price_history(start_date, end_date)
+        visualize_stock_price_history()
 
     else:
         st.write("Enter ARIMA model parameters:")
