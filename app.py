@@ -10,7 +10,7 @@ import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load TSLA data from yfinance
-tsla_data = yf.download("TSLA", start="2015-01-01")
+tsla_data = yf.download("TSLA", start="2015-01-01").asfreq('H')
 
 # Global date range filter
 start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
@@ -80,9 +80,9 @@ def predict_stock_price(p, d, q, use_grid_search):
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
     plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
-    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='D')[1:]
+    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='H')[1:]
     plt.plot(date_range, forecast, label="Predicted Price")
-    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
+    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Hours")
     plt.xlabel("Date")
     plt.ylabel("Closing price ($)")
     plt.legend()
