@@ -50,6 +50,9 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
+    # Apply first-order difference to remove trend and seasonality
+    tsla_data_diff = tsla_data_filtered['Close'].diff().dropna()
+
     if use_grid_search:
         # Perform grid search to find optimal parameters
         p_values = range(0, 7)
@@ -60,7 +63,7 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
             for d in d_values:
                 for q in q_values:
                     try:
-                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
+                        model = ARIMA(tsla_data_diff, order=(p, d, q))
                         results = model.fit()
                         aic = results.aic
                         if aic < best_aic:
@@ -72,10 +75,14 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
         st.write(f"Best ARIMA parameters found by grid search: (p = {ar_param}, d = {integration_order}, q = {ma_param})")
     
     # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_filtered['Close'], order=(ar_param, integration_order, ma_param))
+    model = ARIMA(tsla_data_diff, order=(ar_param, integration_order, ma_param))
     results = model.fit()
     future_periods = 7
-    forecast = results.forecast(steps=future_periods)
+    forecast_diff = results.forecast(steps=future_periods)
+
+    # Add back the last observed value and cumulatively sum the forecasted differences to get the forecasted prices
+    last_observed_value = tsla_data_filtered['Close'].iloc[-1]
+    forecast = np.cumsum(forecast_diff) + last_observed_value
 
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
