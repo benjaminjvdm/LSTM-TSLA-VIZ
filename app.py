@@ -10,7 +10,7 @@ import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load TSLA data from yfinance
-tsla_data = yf.download("TSLA", start="2015-01-01", end="2023-04-23")
+tsla_data = yf.download("TSLA", start="2015-01-01")
 
 def visualize_stock_price_history():
     plt.figure(figsize=(16,8))
