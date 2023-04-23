@@ -50,17 +50,6 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
     # Filter data based on selected dates
     tsla_data_filtered = tsla_data.loc[start_date:end_date]
 
-    # Apply differencing to make the time series stationary
-    tsla_data_diff = tsla_data_filtered['Close'].diff().dropna()
-
-    # Check if the resulting time series is stationary using the ADF test
-    adf_result = adfuller(tsla_data_diff)
-    st.write("ADF Statistic:", adf_result[0])
-    st.write("p-value:", adf_result[1])
-    st.write("Critical Values:", adf_result[4])
-    if adf_result[1] > 0.05:
-        st.warning("The time series is not stationary!")
-
     if use_grid_search:
         # Perform grid search to find optimal parameters
         p_values = range(0, 7)
@@ -71,7 +60,7 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
             for d in d_values:
                 for q in q_values:
                     try:
-                        model = ARIMA(tsla_data_diff, order=(p, d, q))
+                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
                         results = model.fit()
                         aic = results.aic
                         if aic < best_aic:
@@ -83,14 +72,14 @@ def predict_stock_price(ar_param, integration_order, ma_param, use_grid_search):
         st.write(f"Best ARIMA parameters found by grid search: (p = {ar_param}, d = {integration_order}, q = {ma_param})")
     
     # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_diff, order=(ar_param, integration_order, ma_param))
+    model = ARIMA(tsla_data_filtered['Close'], order=(ar_param, integration_order, ma_param))
     results = model.fit()
     future_periods = 7
     forecast = results.forecast(steps=future_periods)
 
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
-    plt.plot(tsla_data_filtered.index[1:], tsla_data_diff, label="Original Data")
+    plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
     date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1, freq='D')[1:]
     plt.plot(date_range, forecast, label="Predicted Price")
     plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
