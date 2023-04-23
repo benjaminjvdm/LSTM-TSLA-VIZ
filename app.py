@@ -81,7 +81,7 @@ def predict_stock_price(use_auto_arima):
 
 # Streamlit app
 def main():
-        st.title("Tesla (TSLA) Stock Price Analysis")
+    st.title("Tesla (TSLA) Stock Price Analysis")
 
     # Sidebar options
     option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
