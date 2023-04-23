@@ -52,9 +52,9 @@ def predict_stock_price(p, d, q, use_grid_search):
 
     if use_grid_search:
         # Perform grid search to find optimal parameters
-        p_values = range(0, 5)
-        d_values = range(0, 5)
-        q_values = range(0, 5)
+        p_values = range(0, 6)
+        d_values = range(0, 6)
+        q_values = range(0, 6)
         best_aic, best_order = np.inf, None
         for p in p_values:
             for d in d_values:
@@ -100,9 +100,9 @@ def main():
 
     else:
         st.write("Enter ARIMA model parameters:")
-        p = st.slider("AR parameter (p)", 0, 5, 2)
-        d = st.slider("Integration order (d)", 0, 5, 1)
-        q = st.slider("MA parameter (q)", 0, 5, 2)
+        p = st.slider("AR parameter (p)", 0, 6, 2)
+        d = st.slider("Integration order (d)", 0, 6, 1)
+        q = st.slider("MA parameter (q)", 0, 6, 2)
         use_grid_search = st.checkbox("Use grid search to find optimal parameters", value=False)
 
         predict_stock_price(p, d, q, use_grid_search)
