@@ -1,7 +1,7 @@
-streamlit
-pandas
-numpy
-pmdarima
-matplotlib
-seaborn
-yfinance
+streamlit==0.88.0
+pandas==1.2.4
+numpy==1.20.3
+statsmodels==0.12.2
+matplotlib==3.4.2
+seaborn==0.11.1
+yfinance==0.1.64
