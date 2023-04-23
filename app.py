@@ -10,7 +10,7 @@ import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load TSLA data from yfinance
-tsla_data = yf.download("TSLA", start="2015-01-01").asfreq('H')
+tsla_data = yf.download("TSLA", start="2015-01-01").asfreq('1H')
 
 # Global date range filter
 start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
