@@ -93,19 +93,23 @@ def main():
     st.title("Tesla (TSLA) Stock Price Analysis")
 
     # Sidebar options
-    option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
+    option = st.sidebar.selectbox(
+        'Choose an option:',
+        ('Visualize stock price history', 'Predict future stock prices')
+    )
 
-    if option == "Stock Price History and Technical Indicators":
+    if option == 'Visualize stock price history':
         visualize_stock_price_history()
+    elif option == 'Predict future stock prices':
+        # ARIMA model parameters
+        p = st.sidebar.slider("ARIMA (p) parameter", 0, 3, 1)
+        d = st.sidebar.slider("ARIMA (d) parameter", 0, 3, 1)
+        q = st.sidebar.slider("ARIMA (q) parameter", 0, 3, 1)
 
-    else:
-        st.write("Enter ARIMA model parameters:")
-        p = st.slider("AR parameter (p)", 0, 5, 2)
-        d = st.slider("Integration order (d)", 0, 5, 1)
-        q = st.slider("MA parameter (q)", 0, 5, 2)
-        use_grid_search = st.checkbox("Use grid search to find optimal parameters", value=False)
-
+        # Use grid search to find optimal parameters
+        use_grid_search = st.sidebar.checkbox("Use grid search to find optimal parameters")
+        
         predict_stock_price(p, d, q, use_grid_search)
 
 if __name__ == "__main__":
-    main() 
+    main()
