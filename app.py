@@ -79,19 +79,19 @@ def predict_stock_price(use_auto_arima):
     ax.legend()
     st.pyplot
 
-#Streamlit
+#Streamlit App
 def main():
-st.title("Tesla (TSLA) Stock Price Analysis")
+    st.title("Tesla (TSLA) Stock Price Analysis")
 
-# Sidebar options
-option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
+    # Sidebar options
+    option = st.sidebar.selectbox("Select an option", ("Stock Price History and Technical Indicators", "Predict Future Prices"))
 
-if option == "Stock Price History and Technical Indicators":
-    visualize_stock_price_history()
+    if option == "Stock Price History and Technical Indicators":
+        visualize_stock_price_history()
 
-else:
-    use_auto_arima = st.checkbox("Use auto-ARIMA to find optimal parameters", value=True)
-    predict_stock_price(use_auto_arima)
+    else:
+        use_auto_arima = st.checkbox("Use auto-ARIMA to find optimal parameters", value=True)
+        predict_stock_price(use_auto_arima)
 
-if name == "main":
-main()
+if __name__ == "__main__":
+    main()
