@@ -57,6 +57,15 @@ def visualize_stock_price_history():
 
 # Build and train the LSTM model
 def build_and_train_model():
+    # Filter data based on selected dates
+    tsla_data_filtered = tsla_data.loc[start_date:end_date]
+
+    # Preprocess data
+    data = tsla_data_filtered.filter(['Close'])
+    dataset = data.values
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(dataset)
+
     # Create training dataset
     training_data_len = int(len(dataset) * 0.8)
     train_data = scaled_data[0:training_data_len, :]
