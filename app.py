@@ -109,7 +109,7 @@ def build_and_train_model():
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
     train = data[:training_data_len]
-    valid = data[training_data_len:]
+    valid = data[training_data_len:].copy()
     valid['Predictions'] = predictions
     plt.title("Predicted Stock Prices")
     plt.xlabel("Date")
