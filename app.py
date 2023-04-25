@@ -116,7 +116,7 @@ def build_and_train_model():
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
     # Make predictions
-    predictions = model.predict(x_test, steps=5)
+    predictions = model.predict(x_test)
     predictions = scaler.inverse_transform(predictions)
 
     # Evaluate the model
@@ -130,8 +130,7 @@ def build_and_train_model():
 
     fig, ax = plt.subplots(figsize=(16,8))
     ax.plot(train['Close'])
-    ax.plot(valid.index[-5:], valid['Close'][-5:])
-    ax.plot(valid.index[-5:], valid['Predictions'][-5:])
+    ax.plot(valid[['Close', 'Predictions']])
     ax.legend(['Train', 'Validation', 'Prediction'], loc='upper left')
     ax.set_title('Tesla (TSLA) Stock Price Prediction')
     ax.set_ylabel('Closing price ($)')
