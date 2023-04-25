@@ -4,7 +4,7 @@ This project analyzes the historical stock price of Tesla (TSLA) using the Pytho
 
 ## Project Structure
 
-The project consists of a single file, `tsla_stock_analysis.py`, which contains the following functions:
+The project consists of a single file, `app.py`, which contains the following functions:
 
 * `visualize_stock_price_history()` - This function visualizes the historical TSLA stock price along with the Relative Strength Index (RSI) and Stochastic Oscillator. It takes no input parameters.
 
