@@ -125,11 +125,13 @@ def main():
     # Sidebar options
     option = st.sidebar.selectbox(
         'Choose an option:',
-        ('Visualize stock price history',)
+        ('Visualize stock price history', 'Train and evaluate LSTM model')
     )
 
     if option == 'Visualize stock price history':
         visualize_stock_price_history()
+    elif option == 'Train and evaluate LSTM model':
+        build_and_train_model()
 
 if __name__ == "__main__":
     main()
