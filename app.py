@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
 
+from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
 from sklearn.preprocessing import MinMaxScaler
