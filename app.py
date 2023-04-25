@@ -1,20 +1,29 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
 
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Dropout
+from sklearn.preprocessing import MinMaxScaler
+
 # Disable warnings
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# Load TSLA data from yfinance
+# Load TSLA data from yfinance and preprocess data
 tsla_data = yf.download("TSLA", start="2015-01-01")
 
 # Global date range filter
 start_date = st.sidebar.date_input("Start date", value=tsla_data.index.min())
 end_date = st.sidebar.date_input("End date", value=tsla_data.index.max())
+
+# Preprocess data
+data = tsla_data.filter(['Close'])
+dataset = data.values
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(dataset)
 
 def visualize_stock_price_history():
     # Filter data based on selected dates
@@ -46,70 +55,81 @@ def visualize_stock_price_history():
     axes[2].legend()
     st.pyplot()
 
-def predict_stock_price(p, d, q, use_grid_search):
-    # Filter data based on selected dates
-    tsla_data_filtered = tsla_data.loc[start_date:end_date]
+# Build and train the LSTM model
+def build_and_train_model():
+    # Create training dataset
+    training_data_len = int(len(dataset) * 0.8)
+    train_data = scaled_data[0:training_data_len, :]
 
-    if use_grid_search:
-        # Perform grid search to find optimal parameters
-        p_values = range(0, 7)
-        d_values = range(0, 7)
-        q_values = range(0, 7)
-        best_aic, best_order = np.inf, None
-        for p in p_values:
-            for d in d_values:
-                for q in q_values:
-                    try:
-                        model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
-                        results = model.fit()
-                        aic = results.aic
-                        if aic < best_aic:
-                            best_aic, best_order = aic, (p, d, q)
-                    except:
-                        continue
+    x_train = []
+    y_train = []
 
-        p, d, q = best_order
-        st.write(f"Best ARIMA parameters found by grid search: (p = {p}, d = {d}, q = {q})")
-    
-    # Build the ARIMA model with selected or best parameters
-    model = ARIMA(tsla_data_filtered['Close'], order=(p, d, q))
-    results = model.fit()
-    future_periods = 30
-    forecast = results.forecast(steps=future_periods)
+    for i in range(60, len(train_data)):
+        x_train.append(train_data[i-60:i, 0])
+        y_train.append(train_data[i, 0])
+
+    x_train, y_train = np.array(x_train), np.array(y_train)
+
+    # Reshape the data
+    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+
+    # Build LSTM model
+    model = Sequential()
+    model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+    model.add(Dropout(0.2))
+    model.add(LSTM(units=50, return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(LSTM(units=50))
+    model.add(Dropout(0.2))
+    model.add(Dense(units=1))
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    # Train the model
+    model.fit(x_train, y_train, epochs=5, batch_size=32)
+
+    # Create testing dataset
+    test_data = scaled_data[training_data_len - 60:, :]
+
+    x_test = []
+    y_test = dataset[training_data_len:, :]
+    for i in range(60, len(test_data)):
+        x_test.append(test_data[i-60:i, 0])
+
+    x_test = np.array(x_test)
+
+    # Reshape the data
+    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+    # Get predictions
+    predictions = model.predict(x_test)
+    predictions = scaler.inverse_transform(predictions)
 
     # Plot forecasted stock prices
     plt.figure(figsize=(16,8))
-    plt.plot(tsla_data_filtered.index, tsla_data_filtered['Close'])
-    date_range = pd.date_range(start=tsla_data_filtered.index[-1], periods=future_periods+1)[1:]
-    plt.plot(date_range, forecast, label="Predicted Price")
-    plt.title("Predicted Stock Prices for Next " + str(future_periods) + " Days")
+    train = data[:training_data_len]
+    valid = data[training_data_len:]
+    valid['Predictions'] = predictions
+    plt.title("Predicted Stock Prices")
     plt.xlabel("Date")
     plt.ylabel("Closing price ($)")
-    plt.legend()
+    plt.plot(train['Close'])
+    plt.plot(valid[['Close', 'Predictions']])
+    plt.legend(['Train', 'Valid', 'Predictions'], loc='lower right')
     st.pyplot()
-
-# Streamlit app
+    
 def main():
     st.title("Tesla (TSLA) Stock Price Analysis")
 
     # Sidebar options
     option = st.sidebar.selectbox(
         'Choose an option:',
-        ('Visualize stock price history', 'Predict future stock prices')
+        ('Visualize stock price history',)
     )
 
     if option == 'Visualize stock price history':
         visualize_stock_price_history()
-    elif option == 'Predict future stock prices':
-        # ARIMA model parameters
-        p = st.sidebar.slider("ARIMA (p) parameter", 0, 7, 1)
-        d = st.sidebar.slider("ARIMA (d) parameter", 0, 7, 1)
-        q = st.sidebar.slider("ARIMA (q) parameter", 0, 7, 1)
-
-        # Use grid search to find optimal parameters
-        use_grid_search = st.sidebar.checkbox("Use grid search to find optimal parameters")
-        
-        predict_stock_price(p, d, q, use_grid_search)
 
 if __name__ == "__main__":
     main()
