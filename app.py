@@ -126,7 +126,7 @@ def build_and_train_model():
     # Plot predictions vs actual data
     train = data[:training_data_len]
     valid = data[training_data_len:]
-    valid['Predictions'] = predictions
+    valid.loc[:, 'Predictions'] = predictions
 
     fig, ax = plt.subplots(figsize=(16,8))
     ax.plot(train['Close'])
