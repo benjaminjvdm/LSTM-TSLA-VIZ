@@ -22,10 +22,10 @@ pip install streamlit pandas numpy matplotlib seaborn yfinance tensorflow
 
 ## Usage
 
-To run the project, navigate to the directory containing `tsla_stock_analysis.py` and run the following command in the terminal:
+To run the project, navigate to the directory containing `app.py` and run the following command in the terminal:
 
 ```
-streamlit run tsla_stock_analysis.py
+streamlit run app.py
 ```
 
 This will start a local server and open the project in your web browser. From there, you can use the sidebar to select the analysis type you want to perform: stock price history or stock price prediction.
