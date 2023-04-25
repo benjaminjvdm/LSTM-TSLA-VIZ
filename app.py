@@ -86,61 +86,65 @@ def build_and_train_model():
     model = Sequential()
     model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
     model.add(Dropout(0.2))
+
     model.add(LSTM(units=50, return_sequences=True))
     model.add(Dropout(0.2))
+
     model.add(LSTM(units=50))
     model.add(Dropout(0.2))
+
     model.add(Dense(units=1))
 
     # Compile the model
-    model.compile(optimizer='adam', loss='mean_squared_error')
+    opt = RMSprop(lr=0.001)
+    model.compile(optimizer=opt, loss='mean_squared_error')
 
     # Train the model
-    model.fit(x_train, y_train, epochs=5, batch_size=32)
+    epochs = 100
+    batch_size = 32
+    model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
 
-    # Create testing dataset
+    # Test dataset
     test_data = scaled_data[training_data_len - 60:, :]
-
     x_test = []
     y_test = dataset[training_data_len:, :]
     for i in range(60, len(test_data)):
         x_test.append(test_data[i-60:i, 0])
 
     x_test = np.array(x_test)
-
-    # Reshape the data
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
-    # Get predictions
+    # Make predictions
     predictions = model.predict(x_test)
     predictions = scaler.inverse_transform(predictions)
 
-    # Plot forecasted stock prices
-    plt.figure(figsize=(16,8))
+    # Evaluate the model
+    rmse = np.sqrt(np.mean(predictions - y_test)**2)
+    print('Root Mean Squared Error:', rmse)
+
+    # Plot predictions vs actual data
     train = data[:training_data_len]
-    valid = data[training_data_len:].copy()
+    valid = data[training_data_len:]
     valid['Predictions'] = predictions
-    plt.title("Predicted Stock Prices")
-    plt.xlabel("Date")
-    plt.ylabel("Closing price ($)")
-    plt.plot(train['Close'])
-    plt.plot(valid[['Close', 'Predictions']])
-    plt.legend(['Train', 'Valid', 'Predictions'], loc='lower right')
+
+    fig, ax = plt.subplots(figsize=(16,8))
+    ax.plot(train['Close'])
+    ax.plot(valid[['Close', 'Predictions']])
+    ax.legend(['Train', 'Validation', 'Prediction'], loc='upper left')
+    ax.set_title('Tesla (TSLA) Stock Price Prediction')
+    ax.set_ylabel('Closing price ($)')
     st.pyplot()
-    
+
+# Main function
 def main():
-    st.title("Tesla (TSLA) Stock Price Analysis")
+    st.sidebar.title("Tesla (TSLA) Stock Price Analysis")
+    options = ["Stock Price History", "Stock Price Prediction"]
+    choice = st.sidebar.selectbox("Select analysis type:", options)
 
-    # Sidebar options
-    option = st.sidebar.selectbox(
-        'Choose an option:',
-        ('Visualize stock price history', 'Train and evaluate LSTM model')
-    )
-
-    if option == 'Visualize stock price history':
+    if choice == "Stock Price History":
         visualize_stock_price_history()
-    elif option == 'Train and evaluate LSTM model':
+    elif choice == "Stock Price Prediction":
         build_and_train_model()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
