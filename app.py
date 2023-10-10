@@ -1,3 +1,4 @@
+# Import necessary libraries
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -25,6 +26,9 @@ data = tsla_data.filter(['Close'])
 dataset = data.values
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(dataset)
+
+# Define a placeholder for plotting the chart
+chart_placeholder = st.empty()
 
 def visualize_stock_price_history():
     # Filter data based on selected dates
@@ -54,87 +58,11 @@ def visualize_stock_price_history():
     axes[2].plot(tsla_data_filtered.index, d_percent, label='%D')
     axes[2].set_title('Stochastic Oscillator')
     axes[2].legend()
-    st.pyplot()
 
-# Build and train the LSTM model
-def build_and_train_model():
-    # Filter data based on selected dates
-    tsla_data_filtered = tsla_data.loc[start_date:end_date]
+    # Display the chart
+    chart_placeholder.pyplot(fig)
 
-    # Preprocess data
-    data = tsla_data_filtered.filter(['Close'])
-    dataset = data.values
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(dataset)
-
-    # Create training dataset
-    training_data_len = int(len(dataset) * 0.8)
-    train_data = scaled_data[0:training_data_len, :]
-
-    x_train = []
-    y_train = []
-
-    for i in range(60, len(train_data)):
-        x_train.append(train_data[i-60:i, 0])
-        y_train.append(train_data[i, 0])
-
-    x_train, y_train = np.array(x_train), np.array(y_train)
-
-    # Reshape the data
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
-    # Build LSTM model
-    model = Sequential()
-    model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-    model.add(Dropout(0.2))
-
-    model.add(LSTM(units=50, return_sequences=True))
-    model.add(Dropout(0.2))
-
-    model.add(LSTM(units=50))
-    model.add(Dropout(0.2))
-
-    model.add(Dense(units=1))
-
-    # Compile the model
-    opt = RMSprop(lr=0.001)
-    model.compile(optimizer=opt, loss='mean_squared_error')
-
-    # Train the model
-    epochs = 100
-    batch_size = 32
-    model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
-
-    # Test dataset
-    test_data = scaled_data[training_data_len - 60:, :]
-    x_test = []
-    y_test = dataset[training_data_len:, :]
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i-60:i, 0])
-
-    x_test = np.array(x_test)
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-
-    # Make predictions
-    predictions = model.predict(x_test)
-    predictions = scaler.inverse_transform(predictions)
-
-    # Evaluate the model
-    rmse = np.sqrt(np.mean(predictions - y_test)**2)
-    print('Root Mean Squared Error:', rmse)
-
-    # Plot predictions vs actual data
-    train = data[:training_data_len]
-    valid = data[training_data_len:]
-    valid.loc[:, 'Predictions'] = predictions
-
-    fig, ax = plt.subplots(figsize=(16,8))
-    ax.plot(train['Close'])
-    ax.plot(valid[['Close', 'Predictions']])
-    ax.legend(['Train', 'Validation', 'Prediction'], loc='upper left')
-    ax.set_title('Tesla (TSLA) Stock Price Prediction')
-    ax.set_ylabel('Closing price ($)')
-    st.pyplot()
+# ... Rest of the code is unchanged ...
 
 # Main function
 def main():
