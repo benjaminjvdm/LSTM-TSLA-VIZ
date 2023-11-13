@@ -152,7 +152,7 @@ def main():
 
     # Add a footer
     st.sidebar.markdown("---")
-    st.sidebar.text("Built with ❤️ by Your Name")
+    st.sidebar.text("Built with ❤️ by Benjee(문벤지)")
 
 if __name__ == '__main__':
     main()
