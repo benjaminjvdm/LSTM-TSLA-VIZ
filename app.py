@@ -54,6 +54,7 @@ def visualize_stock_price_history():
     axes[2].plot(tsla_data_filtered.index, d_percent, label='%D')
     axes[2].set_title('Stochastic Oscillator')
     axes[2].legend()
+    
     st.pyplot()
 
 # Build and train the LSTM model
@@ -101,7 +102,7 @@ def build_and_train_model():
     model.compile(optimizer=opt, loss='mean_squared_error')
 
     # Train the model
-    epochs = 100
+    epochs = 50
     batch_size = 32
     model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
 
@@ -121,7 +122,7 @@ def build_and_train_model():
 
     # Evaluate the model
     rmse = np.sqrt(np.mean(predictions - y_test)**2)
-    print('Root Mean Squared Error:', rmse)
+    st.write('Root Mean Squared Error:', rmse)
 
     # Plot predictions vs actual data
     train = data[:training_data_len]
@@ -138,7 +139,9 @@ def build_and_train_model():
 
 # Main function
 def main():
-    st.sidebar.title("Tesla (TSLA) Stock Price Analysis")
+    st.title("Tesla (TSLA) Stock Price Analysis")
+    st.sidebar.title("Options")
+
     options = ["Stock Price History", "Stock Price Prediction"]
     choice = st.sidebar.selectbox("Select analysis type:", options)
 
@@ -146,6 +149,10 @@ def main():
         visualize_stock_price_history()
     elif choice == "Stock Price Prediction":
         build_and_train_model()
+
+    # Add a footer
+    st.sidebar.markdown("---")
+    st.sidebar.text("Built with ❤️ by Your Name")
 
 if __name__ == '__main__':
     main()
