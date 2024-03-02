@@ -262,7 +262,7 @@ def main():
     st.title("Tesla (TSLA) Stock Price Analysis")
     st.sidebar.title("Options")
 
-    options = ["Stock Price History", "All Models", "Stock Price Prediction - LSTM", "Stock Price Prediction - SVM", "Stock Price Prediction - LightGBM"]
+    options = ["Stock Indicator Analysis", "All Models", "Stock Price Prediction - LSTM", "Stock Price Prediction - SVM", "Stock Price Prediction - LightGBM"]
     choice = st.sidebar.selectbox("Select analysis type:", options)
 
     if choice == "Stock Price History":
