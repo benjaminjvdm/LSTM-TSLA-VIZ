@@ -1,4 +1,5 @@
 streamlit
+lightgbm
 pandas
 numpy
 matplotlib
@@ -6,3 +7,5 @@ seaborn
 yfinance
 tensorflow
 scikit-learn
+sklearn.preprocessing
+sklearn.svm
