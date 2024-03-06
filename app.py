@@ -265,7 +265,7 @@ def main():
     options = ["Stock Indicator Analysis", "All Models", "Stock Price Prediction - LSTM", "Stock Price Prediction - SVM", "Stock Price Prediction - LightGBM"]
     choice = st.sidebar.selectbox("Select analysis type:", options)
 
-    if choice == "Stock Price History":
+    if choice == "Stock Indicator Analysis":
         visualize_stock_price_history()
     elif choice == "All Models":
         build_and_train_model()
