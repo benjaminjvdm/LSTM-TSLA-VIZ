@@ -52,5 +52,3 @@ Stock data is retrieved from Yahoo Finance (yfinance)
 
 **Disclaimer**
 This code and application are intended for educational and exploratory purposes. They should not be considered a substitute for professional financial advice.
-
-**Let me know if you'd like help refining the README further or have questions about specific sections!** 
