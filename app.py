@@ -122,7 +122,7 @@ def build_and_train_model():
     model.add(Dense(units=1))
 
     # Compile the model
-    opt = RMSprop(lr=0.001)
+    opt = RMSprop(learning_rate=0.001)
     model.compile(optimizer=opt, loss='mean_squared_error')
 
     # Train the model
