@@ -1,9 +1,9 @@
-streamlit==1.23.1
-numpy==1.22.0 # Downgraded for TensorFlow compatibility
-matplotlib==3.7.1
-yfinance==0.2.18
-pandas==1.5.3
-keras==2.12.0
-tensorflow==2.12.0 
-scikit-learn==1.2.2
-lightgbm==3.3.5
+streamlit
+lightgbm
+pandas
+numpy
+matplotlib
+seaborn
+yfinance
+tensorflow
+scikit-learn
