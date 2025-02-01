@@ -126,7 +126,7 @@ def build_and_train_model():
     model.compile(optimizer=opt, loss='mean_squared_error')
 
     # Train the model
-    epochs = 15
+    epochs = 64
     batch_size = 64
     model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
 
