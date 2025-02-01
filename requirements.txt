@@ -7,3 +7,4 @@ keras==2.12.0
 tensorflow==2.12.0 
 scikit-learn==1.2.2
 lightgbm==3.3.5
+requests
